@@ -1,8 +1,3 @@
-// ======================================
-// DESENTOPE MAIS
-// JavaScript principal
-// ======================================
-
 (function () {
     "use strict";
 
@@ -11,10 +6,6 @@
     const navLinks = document.querySelectorAll(".nav a");
     const sections = document.querySelectorAll("section[id]");
     const primaryColor = getComputedStyle(document.documentElement).getPropertyValue("--color-primary").trim();
-
-    // =========================
-    // MENU MOBILE
-    // =========================
 
     function toggleMenu() {
         const isOpen = nav.classList.toggle("is-open");
@@ -30,11 +21,9 @@
 
     if (menuToggle && nav) {
         menuToggle.addEventListener("click", toggleMenu);
-
         navLinks.forEach(function (link) {
             link.addEventListener("click", closeMenu);
         });
-
         document.addEventListener("click", function (event) {
             const isClickInside = nav.contains(event.target) || menuToggle.contains(event.target);
             if (!isClickInside && nav.classList.contains("is-open")) {
@@ -43,18 +32,12 @@
         });
     }
 
-    // =========================
-    // SCROLL SPY
-    // =========================
-
     function updateActiveLink() {
         const scrollPosition = window.scrollY + 100;
-
         sections.forEach(function (section) {
             const sectionTop = section.offsetTop;
             const sectionHeight = section.offsetHeight;
             const sectionId = section.getAttribute("id");
-
             if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
                 navLinks.forEach(function (link) {
                     link.style.color = "";
@@ -74,9 +57,5 @@
         scrollTimeout = window.requestAnimationFrame(updateActiveLink);
     });
 
-    // =========================
-    // INICIALIZAÇÃO
-    // =========================
-
     updateActiveLink();
-}));
+})();
