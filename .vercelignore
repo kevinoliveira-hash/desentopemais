@@ -1,0 +1,7 @@
+.git
+.vscode
+.env*
+node_modules
+.work
+site-restaurado.png
+README.md

@@ -1,61 +1,72 @@
-(function () {
-    "use strict";
+(() => {
+  'use strict';
 
-    const menuToggle = document.querySelector(".menu-toggle");
-    const nav = document.querySelector(".nav");
-    const navLinks = document.querySelectorAll(".nav a");
-    const sections = document.querySelectorAll("section[id]");
-    const primaryColor = getComputedStyle(document.documentElement).getPropertyValue("--color-primary").trim();
+  // Identificadores que já estavam configurados no site principal.
+  const ads = {
+    id: 'AW-18498129474',
+    phoneConversion: 'AW-18498129474/MI-RCNq9iJ4dEMKczPRE'
+  };
 
-    function toggleMenu() {
-        const isOpen = nav.classList.toggle("is-open");
-        menuToggle.setAttribute("aria-expanded", isOpen);
-        menuToggle.setAttribute("aria-label", isOpen ? "Fechar menu de navegação" : "Abrir menu de navegação");
-    }
+  const toggle = document.getElementById('menu-toggle');
+  const menu = document.getElementById('menu');
 
-    function closeMenu() {
-        nav.classList.remove("is-open");
-        menuToggle.setAttribute("aria-expanded", "false");
-        menuToggle.setAttribute("aria-label", "Abrir menu de navegação");
-    }
+  if (toggle && menu) {
+    document.documentElement.classList.add('js');
+    toggle.hidden = false;
 
-    if (menuToggle && nav) {
-        menuToggle.addEventListener("click", toggleMenu);
-        navLinks.forEach(function (link) {
-            link.addEventListener("click", closeMenu);
-        });
-        document.addEventListener("click", function (event) {
-            const isClickInside = nav.contains(event.target) || menuToggle.contains(event.target);
-            if (!isClickInside && nav.classList.contains("is-open")) {
-                closeMenu();
-            }
-        });
-    }
+    const setMenu = (open, returnFocus = false) => {
+      menu.classList.toggle('is-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
+      if (returnFocus) toggle.focus();
+    };
 
-    function updateActiveLink() {
-        const scrollPosition = window.scrollY + 100;
-        sections.forEach(function (section) {
-            const sectionTop = section.offsetTop;
-            const sectionHeight = section.offsetHeight;
-            const sectionId = section.getAttribute("id");
-            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
-                navLinks.forEach(function (link) {
-                    link.style.color = "";
-                    if (link.getAttribute("href") === "#" + sectionId) {
-                        link.style.color = primaryColor;
-                    }
-                });
-            }
-        });
-    }
-
-    let scrollTimeout;
-    window.addEventListener("scroll", function () {
-        if (scrollTimeout) {
-            window.cancelAnimationFrame(scrollTimeout);
-        }
-        scrollTimeout = window.requestAnimationFrame(updateActiveLink);
+    toggle.addEventListener('click', () => {
+      setMenu(toggle.getAttribute('aria-expanded') !== 'true');
     });
+    menu.addEventListener('click', (event) => {
+      if (event.target.closest('a')) setMenu(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setMenu(false, true);
+      }
+    });
+    document.addEventListener('click', (event) => {
+      if (!menu.contains(event.target) && !toggle.contains(event.target)) setMenu(false);
+    });
+    window.matchMedia('(min-width: 1000px)').addEventListener('change', () => setMenu(false));
+  }
 
-    updateActiveLink();
+  // A medição carrega em produção após os recursos principais da página.
+  // Nenhum evento cancela ou adia a abertura do telefone/WhatsApp.
+  const productionHosts = ['desentopemais.com.br', 'www.desentopemais.com.br'];
+  if (!productionHosts.includes(window.location.hostname)) return;
+
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+  window.gtag('js', new Date());
+  window.gtag('config', ads.id);
+
+  const loadAds = () => {
+    const tag = document.createElement('script');
+    tag.async = true;
+    tag.src = 'https://www.googletagmanager.com/gtag/js?id=' + ads.id;
+    document.head.append(tag);
+  };
+  if (document.readyState === 'complete') loadAds();
+  else window.addEventListener('load', loadAds, { once: true });
+
+  document.addEventListener('click', (event) => {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const link = event.target.closest('a[href]');
+    if (!link) return;
+
+    if (link.protocol === 'tel:') {
+      window.gtag('event', 'conversion', { send_to: ads.phoneConversion });
+    } else if (link.hostname === 'wa.me') {
+      // Clique, sem inventar um rótulo de conversão de WhatsApp.
+      window.gtag('event', 'whatsapp_click', { contact_method: 'whatsapp' });
+    }
+  });
 })();
