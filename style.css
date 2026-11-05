@@ -788,3 +788,9 @@ h1, h2, h3 { color: var(--navy); line-height: 1.15; letter-spacing: -.035em; }
   gap: 7px;
   min-height: 44px;
 }
+
+/* Mantém a chamada local legível em telas estreitas. */
+.hero h1 { max-width: 100%; font-size: clamp(2.25rem, 4.5vw, 4.5rem); }
+@media (max-width: 699px) {
+  .hero h1 { font-size: clamp(1.9rem, 7.5vw, 3.5rem); }
+}
