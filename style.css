@@ -780,3 +780,11 @@ h1, h2, h3 { color: var(--navy); line-height: 1.15; letter-spacing: -.035em; }
   flex: 0 0 auto;
   object-fit: contain;
 }
+
+.instagram-contact { margin-top: 22px; }
+.footer-contact .footer-social {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+}
